@@ -14,8 +14,9 @@ struct ContentView: View {
     @State private var tipPercentage = 20
     @FocusState private var isFocused : Bool
     
-    let tipPercentages = [10, 15, 20, 25, 0]
-    
+    var currencyFormat: FloatingPointFormatStyle<Double>.Currency{ get{
+        return .currency(code: Locale.current.currencyCode ?? "USD")
+    } }
     
     var grandTotal : Double{
         let tipSelect = Double(tipPercentage)
@@ -36,7 +37,7 @@ struct ContentView: View {
         NavigationView{
             Form{
                 Section{
-                    TextField("Check Amount", value: $checkAmount, format: .currency(code: Locale.current.currencyCode ?? "USD"))
+                    TextField("Check Amount", value: $checkAmount, format: currencyFormat)
                         .keyboardType(.decimalPad)
                         .focused($isFocused)
                     Picker("Number of people", selection: $numberOfPeople){
@@ -47,21 +48,21 @@ struct ContentView: View {
                 }
                 Section{
                     Picker("Tip percentage", selection: $tipPercentage){
-                        ForEach(tipPercentages, id: \.self){
+                        ForEach(0..<101){
                             Text($0, format: .percent)
                         }
                     }
-                    .pickerStyle(.segmented)
+                    .pickerStyle(.wheel)
                 }header: {
                     Text("How much tip would you like to give?")
                 }
                 Section{
-                    Text(grandTotal, format: .currency(code: Locale.current.currencyCode ?? "USD"))
+                    Text(grandTotal, format: currencyFormat)
                 }header: {
                     Text("Grand Total")
                 }
                 Section{
-                    Text(totalPerPerson, format: .currency(code: Locale.current.currencyCode ?? "USD"))
+                    Text(totalPerPerson, format: currencyFormat)
                 }header: {
                     Text("Total Per Person")
                 }
