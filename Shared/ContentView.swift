@@ -12,16 +12,21 @@ struct ContentView: View {
     @State private var checkAmount = 0.0
     @State private var numberOfPeople = 2
     @State private var tipPercentage = 20
+    @FocusState private var isFocused : Bool
     
     let tipPercentages = [10, 15, 20, 25, 0]
     
-    var totalPerPerson : Double{
-        
-        let peopleCount = Double(numberOfPeople + 2)
+    
+    var grandTotal : Double{
         let tipSelect = Double(tipPercentage)
         
         let tipAmount = checkAmount / 100 * tipSelect
         let grandTotal = checkAmount + tipAmount
+        return grandTotal
+    }
+    var totalPerPerson : Double {
+        
+        let peopleCount = Double(numberOfPeople + 2)
         let amountPerPerson = grandTotal / peopleCount
         
         return amountPerPerson
@@ -32,6 +37,8 @@ struct ContentView: View {
             Form{
                 Section{
                     TextField("Check Amount", value: $checkAmount, format: .currency(code: Locale.current.currencyCode ?? "USD"))
+                        .keyboardType(.decimalPad)
+                        .focused($isFocused)
                     Picker("Number of people", selection: $numberOfPeople){
                         ForEach(2..<100){
                             Text("\($0) people")
@@ -44,11 +51,28 @@ struct ContentView: View {
                             Text($0, format: .percent)
                         }
                     }
+                    .pickerStyle(.segmented)
+                }header: {
+                    Text("How much tip would you like to give?")
+                }
+                Section{
+                    Text(grandTotal, format: .currency(code: Locale.current.currencyCode ?? "USD"))
+                }header: {
+                    Text("Grand Total")
                 }
                 Section{
                     Text(totalPerPerson, format: .currency(code: Locale.current.currencyCode ?? "USD"))
+                }header: {
+                    Text("Total Per Person")
                 }
                 .navigationTitle("SplitCheck")
+            }.toolbar{
+                ToolbarItemGroup(placement: .keyboard){
+                    Spacer()
+                    Button("Done"){
+                        isFocused = false
+                    }
+                }
             }
         }
         
